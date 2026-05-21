@@ -1,92 +1,284 @@
-import React from "react";
+"use client";
 
-export default function WhatsAppLayout() {
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth-context";
+import { auth } from "@/lib/storage";
+import { privateChatAPI, groupsAPI, usersAPI } from "@/lib/api";
+import ChatWindow from "@/components/ChatWindow";
+import Sidebar from "@/components/Sidebar";
+
+export default function HomePage() {
+  const router = useRouter();
+  const { user, token, loading } = useAuth();
+
+  const [selectedChat, setSelectedChat] = useState<any>(null);
+  const [chats, setChats] = useState<any[]>([]);
+  const [groups, setGroups] = useState<any[]>([]);
+
+  const [showCreateGroup, setShowCreateGroup] = useState(false);
+  const [newGroupName, setNewGroupName] = useState("");
+  const [newGroupDescription, setNewGroupDescription] = useState("");
+
+  const [searchUsers, setSearchUsers] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showSearch, setShowSearch] = useState(false);
+
+  useEffect(() => {
+    if (!loading && !token) {
+      router.push("/");
+    }
+  }, [loading, token, router]);
+
+  useEffect(() => {
+    if (token) {
+      loadChats();
+      loadGroups();
+    }
+  }, [token]);
+
+  const loadChats = async () => {
+    try {
+      const result = await privateChatAPI.getAll(token!);
+
+      if (result.success) {
+        setChats(result.chats);
+      }
+    } catch (err) {
+      console.error("Failed to load chats:", err);
+    }
+  };
+
+  const loadGroups = async () => {
+    try {
+      const result = await groupsAPI.getAll(token!);
+
+      if (result.success) {
+        setGroups(result.groups);
+      }
+    } catch (err) {
+      console.error("Failed to load groups:", err);
+    }
+  };
+
+  const handleCreateGroup = async () => {
+    if (!newGroupName.trim()) return;
+
+    try {
+      const result = await groupsAPI.create(
+        token!,
+        newGroupName,
+        newGroupDescription,
+      );
+
+      if (result.success) {
+        setNewGroupName("");
+        setNewGroupDescription("");
+        setShowCreateGroup(false);
+
+        await loadGroups();
+      }
+    } catch (err) {
+      console.error("Failed to create group:", err);
+    }
+  };
+
+  const handleSearchUsers = async (query: string) => {
+    setSearchUsers(query);
+
+    if (query.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    try {
+      const result = await usersAPI.search(query);
+
+      if (result.success) {
+        setSearchResults(result.users);
+      }
+    } catch (err) {
+      console.error("Failed to search users:", err);
+    }
+  };
+
+  const handleStartChat = async (otherUserId: number) => {
+    try {
+      const result = await privateChatAPI.getOrCreate(token!, otherUserId);
+
+      if (result.success) {
+        setShowSearch(false);
+        setSearchUsers("");
+
+        await loadChats();
+      }
+    } catch (err) {
+      console.error("Failed to start chat:", err);
+    }
+  };
+
+  const handleLogout = () => {
+    auth.removeToken();
+    router.push("/");
+  };
+
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-[#111b21]">
+        <div className="text-white text-lg animate-pulse">Loading...</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex h-screen bg-[#e5ddd5]">
-      {/* SIDEBAR */}
-      <aside className="w-1/3 bg-white flex flex-col border-r border-gray-200">
-        {/* Header */}
-        <div className="p-4 bg-gray-100 flex items-center gap-3">
-          <img
-            src="https://i.pravatar.cc/40"
-            alt="profile"
-            className="w-10 h-10 rounded-full"
-          />
-          <h3 className="font-semibold">Il Tuo Nome</h3>
-        </div>
+    <div className="h-screen bg-[#0b141a] overflow-hidden">
+      {/* top green bar */}
+      <div className="absolute top-0 left-0 right-0 h-32 bg-[#00a884]" />
 
-        {/* Search */}
-        <div className="p-3 bg-gray-50">
-          <input
-            type="text"
-            placeholder="Cerca o inizia una nuova chat"
-            className="w-full px-4 py-2 text-sm bg-white rounded-full outline-none border border-gray-200 focus:ring-2 focus:ring-green-400"
-          />
-        </div>
+      {/* main container */}
+      <div className="relative z-10 h-screen p-4">
+        <div className="h-full w-full bg-[#111b21] rounded-xl overflow-hidden shadow-2xl flex border border-[#222e35]">
+          {/* SIDEBAR */}
+          <div className="w-[420px] min-w-[420px] border-r border-[#222e35] bg-[#111b21]">
+            <Sidebar
+              user={user}
+              chats={chats}
+              groups={groups}
+              selectedChat={selectedChat}
+              onSelectChat={setSelectedChat}
+              onShowCreateGroup={() => setShowCreateGroup(true)}
+              onShowSearch={() => setShowSearch(true)}
+              onLogout={handleLogout}
+              searchUsers={searchUsers}
+              onSearchUsers={handleSearchUsers}
+              searchResults={searchResults}
+              onStartChat={handleStartChat}
+              showSearch={showSearch}
+            />
+          </div>
 
-        {/* Chat List */}
-        <div className="flex-1 overflow-y-auto">
-          {[1, 2, 3, 4, 5].map((chat) => (
-            <div
-              key={chat}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 cursor-pointer transition"
-            >
-              <img
-                src={`https://i.pravatar.cc/40?img=${chat}`}
-                alt="avatar"
-                className="w-10 h-10 rounded-full"
+          {/* CHAT AREA */}
+          <div className="flex-1 bg-[#0b141a] relative">
+            {selectedChat ? (
+              <ChatWindow
+                chat={selectedChat}
+                token={token!}
+                currentUserId={user?.id!}
               />
-              <div className="flex-1">
-                <h4 className="text-sm font-medium">Contatto {chat}</h4>
-                <p className="text-xs text-gray-500 truncate">
-                  Ultimo messaggio...
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center text-center px-8 bg-[#222e35]">
+                <div className="w-80 h-80 rounded-full bg-[#111b21] flex items-center justify-center mb-8 shadow-inner">
+                  <div className="text-[120px] opacity-80">💬</div>
+                </div>
+
+                <h1 className="text-4xl font-light text-[#e9edef] mb-4">
+                  Messaggero Web
+                </h1>
+
+                <p className="text-[#8696a0] max-w-md leading-relaxed text-lg">
+                  Invia e ricevi messaggi senza tenere il telefono connesso.
+                  Seleziona una conversazione per iniziare.
                 </p>
+
+                <div className="mt-10 text-sm text-[#667781]">
+                  End-to-end encrypted
+                </div>
               </div>
-              <span className="text-xs text-gray-400">12:3{chat}</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* CREATE GROUP MODAL */}
+      {showCreateGroup && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-[#202c33] w-[420px] rounded-xl shadow-2xl overflow-hidden border border-[#2f3b43]">
+            <div className="px-6 py-5 border-b border-[#2f3b43]">
+              <h3 className="text-xl text-white font-medium">Nuovo gruppo</h3>
             </div>
-          ))}
-        </div>
-      </aside>
 
-      {/* CHAT AREA */}
-      <main className="w-2/3 flex flex-col">
-        {/* Chat Header */}
-        <div className="p-4 bg-gray-100 flex items-center gap-3 border-b border-gray-200">
-          <img
-            src="https://i.pravatar.cc/40?img=8"
-            alt="avatar"
-            className="w-10 h-10 rounded-full"
-          />
-          <h3 className="font-semibold">Contatto 1</h3>
-        </div>
+            <div className="p-6">
+              <input
+                type="text"
+                placeholder="Nome gruppo"
+                value={newGroupName}
+                onChange={(e) => setNewGroupName(e.target.value)}
+                className="
+                  w-full
+                  bg-[#2a3942]
+                  text-white
+                  px-4
+                  py-3
+                  rounded-lg
+                  border border-transparent
+                  focus:border-[#00a884]
+                  focus:outline-none
+                  mb-4
+                  placeholder:text-[#8696a0]
+                "
+              />
 
-        {/* Messages */}
-        <div className="flex-1 p-6 overflow-y-auto flex flex-col gap-3">
-          <div className="self-start bg-white px-4 py-2 rounded-lg text-sm shadow-sm max-w-xs">
-            Ciao! Come stai?
+              <textarea
+                placeholder="Descrizione"
+                value={newGroupDescription}
+                onChange={(e) => setNewGroupDescription(e.target.value)}
+                rows={4}
+                className="
+                  w-full
+                  bg-[#2a3942]
+                  text-white
+                  px-4
+                  py-3
+                  rounded-lg
+                  border border-transparent
+                  focus:border-[#00a884]
+                  focus:outline-none
+                  mb-6
+                  resize-none
+                  placeholder:text-[#8696a0]
+                "
+              />
+
+              <div className="flex gap-3">
+                <button
+                  onClick={handleCreateGroup}
+                  className="
+                    flex-1
+                    bg-[#00a884]
+                    hover:bg-[#06cf9c]
+                    text-black
+                    font-medium
+                    py-3
+                    rounded-lg
+                    transition
+                  "
+                >
+                  Crea gruppo
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowCreateGroup(false);
+                    setNewGroupName("");
+                    setNewGroupDescription("");
+                  }}
+                  className="
+                    flex-1
+                    bg-[#2a3942]
+                    hover:bg-[#374248]
+                    text-white
+                    py-3
+                    rounded-lg
+                    transition
+                  "
+                >
+                  Annulla
+                </button>
+              </div>
+            </div>
           </div>
-
-          <div className="self-end bg-green-200 px-4 py-2 rounded-lg text-sm shadow-sm max-w-xs">
-            Tutto bene 😄 E tu?
-          </div>
-
-          <div className="self-start bg-white px-4 py-2 rounded-lg text-sm shadow-sm max-w-xs">
-            Benissimo!
-          </div>
         </div>
-
-        {/* Input */}
-        <div className="p-4 bg-gray-100 flex items-center gap-3">
-          <input
-            type="text"
-            placeholder="Scrivi un messaggio"
-            className="flex-1 px-4 py-2 rounded-full border border-gray-300 outline-none focus:ring-2 focus:ring-green-400"
-          />
-          <button className="bg-green-500 text-white px-5 py-2 rounded-full hover:bg-green-600 transition">
-            Invia
-          </button>
-        </div>
-      </main>
+      )}
     </div>
   );
 }
