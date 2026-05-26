@@ -100,7 +100,10 @@ export default function ChatWindow({
         <div className="flex items-center gap-3">
           {chat.type === "private" ? (
             <img
-              src={chat.otherUserProfilePicture || "https://i.pravatar.cc/150"}
+              src={
+                chat.otherUserProfilePicture ||
+                "https://www.pngarts.com/files/10/Default-Profile-Picture-Download-PNG-Image.png"
+              }
               alt={chat.otherUsername}
               className="w-10 h-10 rounded-full object-cover"
             />

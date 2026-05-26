@@ -48,7 +48,10 @@ export default function Sidebar({
       <div className="h-[60px] px-4 bg-[#202c33] flex items-center justify-between border-b border-[#2a3942]">
         <div className="flex items-center gap-3">
           <img
-            src={user?.profile_picture || "https://i.pravatar.cc/150"}
+            src={
+              user?.profile_picture ||
+              "https://www.pngarts.com/files/10/Default-Profile-Picture-Download-PNG-Image.png"
+            }
             alt="profile"
             className="w-10 h-10 rounded-full object-cover"
           />
@@ -58,9 +61,9 @@ export default function Sidebar({
               {user?.username}
             </h3>
 
-            <p className="text-xs text-[#8696a0]">
+            {/*<p className="text-xs text-[#8696a0]">
               {user?.status === "online" ? "online" : "offline"}
-            </p>
+            </p>*/}
           </div>
         </div>
 
@@ -125,7 +128,10 @@ export default function Sidebar({
               "
             >
               <img
-                src={user.profile_picture || "https://i.pravatar.cc/150"}
+                src={
+                  user.profile_picture ||
+                  "https://www.pngarts.com/files/10/Default-Profile-Picture-Download-PNG-Image.png"
+                }
                 alt={user.username}
                 className="w-12 h-12 rounded-full object-cover"
               />
@@ -212,7 +218,8 @@ export default function Sidebar({
             >
               <img
                 src={
-                  chat.otherUserProfilePicture || "https://i.pravatar.cc/150"
+                  chat.otherUserProfilePicture ||
+                  "https://www.pngarts.com/files/10/Default-Profile-Picture-Download-PNG-Image.png"
                 }
                 alt={chat.otherUsername}
                 className="w-12 h-12 rounded-full object-cover"
