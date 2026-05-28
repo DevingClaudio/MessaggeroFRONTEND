@@ -28,7 +28,7 @@ export default function ChatWindow({
   };
 
   useEffect(() => {
-    scrollToBottom();
+    //scrollToBottom();
   }, [messages]);
 
   useEffect(() => {
@@ -96,7 +96,7 @@ export default function ChatWindow({
   return (
     <main className="flex-1 h-full min-h-0 flex flex-col bg-[#0b141a]">
       {/* HEADER */}
-      <div className="h-[60px] px-4 bg-[#202c33] border-b border-[#2a3942] flex items-center justify-between">
+      <div className="h-[15] px-4 bg-[#202c33] border-b border-[#2a3942] flex items-center justify-between">
         <div className="flex items-center gap-3">
           {chat.type === "private" ? (
             <img
