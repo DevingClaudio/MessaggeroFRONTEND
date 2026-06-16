@@ -4,6 +4,7 @@ import { auth } from "@/lib/storage";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { ExternalLink } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -164,6 +165,18 @@ export default function LoginPage() {
             {isRegister ? "Accedi" : "Registrati"}
           </button>
         </p>
+
+        <div className="mt-6 pt-6 border-t border-gray-200 flex justify-center">
+          <a
+            href="https://github.com/DevingClaudio"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-gray-600 hover:text-green-600 transition font-medium text-sm"
+          >
+            <ExternalLink size={18} />
+            Sviluppato da DevingClaudio
+          </a>
+        </div>
       </div>
     </div>
   );

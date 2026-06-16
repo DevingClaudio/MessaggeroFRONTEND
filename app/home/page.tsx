@@ -124,77 +124,74 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-[#111b21]">
-        <div className="text-white text-lg animate-pulse">Loading...</div>
+      <div className="h-screen flex items-center justify-center bg-[#e5ddd5]">
+        <div className="text-gray-600 text-lg animate-pulse">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="h-screen bg-[#0b141a] overflow-hidden">
-      {/* top green bar */}
-      <div className="absolute top-0 left-0 right-0 h-32 bg-[#00a884]" />
-
+    <div className="min-h-screen bg-[#e5ddd5] p-4">
       {/* main container */}
-      <div className="relative z-10 h-screen p-4">
-        <div className="h-full w-full bg-[#111b21] rounded-xl overflow-hidden shadow-2xl flex border border-[#222e35]">
-          {/* SIDEBAR */}
-          <div className="w-[420px] min-w-[420px] border-r border-[#222e35] bg-[#111b21]">
-            <Sidebar
-              user={user}
-              chats={chats}
-              groups={groups}
-              selectedChat={selectedChat}
-              onSelectChat={setSelectedChat}
-              onShowCreateGroup={() => setShowCreateGroup(true)}
-              onShowSearch={() => setShowSearch(true)}
-              onLogout={handleLogout}
-              searchUsers={searchUsers}
-              onSearchUsers={handleSearchUsers}
-              searchResults={searchResults}
-              onStartChat={handleStartChat}
-              showSearch={showSearch}
+      <div className="h-screen max-h-[calc(100vh-2rem)] w-full mx-auto flex gap-4">
+        {/* SIDEBAR */}
+        <div className="w-80 bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col border border-gray-200">
+          <Sidebar
+            user={user}
+            chats={chats}
+            groups={groups}
+            selectedChat={selectedChat}
+            onSelectChat={setSelectedChat}
+            onShowCreateGroup={() => setShowCreateGroup(true)}
+            onShowSearch={() => setShowSearch(true)}
+            onLogout={handleLogout}
+            searchUsers={searchUsers}
+            onSearchUsers={handleSearchUsers}
+            searchResults={searchResults}
+            onStartChat={handleStartChat}
+            showSearch={showSearch}
+          />
+        </div>
+
+        {/* CHAT AREA */}
+        <div className="flex-1 bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col border border-gray-200">
+          {selectedChat ? (
+            <ChatWindow
+              chat={selectedChat}
+              token={token!}
+              currentUserId={user?.id!}
             />
-          </div>
-
-          {/* CHAT AREA */}
-          <div className="flex-1 bg-[#0b141a] relative">
-            {selectedChat ? (
-              <ChatWindow
-                chat={selectedChat}
-                token={token!}
-                currentUserId={user?.id!}
-              />
-            ) : (
-              <div className="h-full flex flex-col items-center justify-center text-center px-8 bg-[#222e35]">
-                <div className="w-80 h-80 rounded-full bg-[#111b21] flex items-center justify-center mb-8 shadow-inner">
-                  <div className="text-[120px] opacity-80">💬</div>
-                </div>
-
-                <h1 className="text-4xl font-light text-[#e9edef] mb-4">
-                  Messaggero Web
-                </h1>
-
-                <p className="text-[#8696a0] max-w-md leading-relaxed text-lg">
-                  Invia e ricevi messaggi senza tenere il telefono connesso.
-                  Seleziona una conversazione per iniziare.
-                </p>
-
-                <div className="mt-10 text-sm text-[#667781]">
-                  End-to-end encrypted
-                </div>
+          ) : (
+            <div className="h-full flex flex-col items-center justify-center text-center px-8">
+              <div className="w-80 h-80 rounded-full bg-gray-100 flex items-center justify-center mb-8">
+                <div className="text-[120px] opacity-60">💬</div>
               </div>
-            )}
-          </div>
+
+              <h1 className="text-4xl font-bold text-gray-800 mb-4">
+                Messaggero Web
+              </h1>
+
+              <p className="text-gray-500 max-w-md leading-relaxed text-lg">
+                Invia e ricevi messaggi senza tenere il telefono connesso.
+                Seleziona una conversazione per iniziare.
+              </p>
+
+              <div className="mt-10 text-sm text-gray-400">
+                End-to-end encrypted
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       {/* CREATE GROUP MODAL */}
       {showCreateGroup && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-[#202c33] w-[420px] rounded-xl shadow-2xl overflow-hidden border border-[#2f3b43]">
-            <div className="px-6 py-5 border-b border-[#2f3b43]">
-              <h3 className="text-xl text-white font-medium">Nuovo gruppo</h3>
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white w-[420px] rounded-2xl shadow-2xl overflow-hidden border border-gray-200">
+            <div className="px-6 py-5 border-b border-gray-200">
+              <h3 className="text-xl text-gray-800 font-semibold">
+                Nuovo gruppo
+              </h3>
             </div>
 
             <div className="p-6">
@@ -205,16 +202,16 @@ export default function HomePage() {
                 onChange={(e) => setNewGroupName(e.target.value)}
                 className="
                   w-full
-                  bg-[#2a3942]
-                  text-white
+                  bg-gray-50
+                  text-gray-800
                   px-4
                   py-3
                   rounded-lg
-                  border border-transparent
-                  focus:border-[#00a884]
+                  border border-gray-300
+                  focus:border-green-600
                   focus:outline-none
                   mb-4
-                  placeholder:text-[#8696a0]
+                  placeholder:text-gray-400
                 "
               />
 
@@ -225,17 +222,17 @@ export default function HomePage() {
                 rows={4}
                 className="
                   w-full
-                  bg-[#2a3942]
-                  text-white
+                  bg-gray-50
+                  text-gray-800
                   px-4
                   py-3
                   rounded-lg
-                  border border-transparent
-                  focus:border-[#00a884]
+                  border border-gray-300
+                  focus:border-green-600
                   focus:outline-none
                   mb-6
                   resize-none
-                  placeholder:text-[#8696a0]
+                  placeholder:text-gray-400
                 "
               />
 
@@ -244,10 +241,10 @@ export default function HomePage() {
                   onClick={handleCreateGroup}
                   className="
                     flex-1
-                    bg-[#00a884]
-                    hover:bg-[#06cf9c]
-                    text-black
-                    font-medium
+                    bg-green-600
+                    hover:bg-green-700
+                    text-white
+                    font-semibold
                     py-3
                     rounded-lg
                     transition
@@ -264,12 +261,13 @@ export default function HomePage() {
                   }}
                   className="
                     flex-1
-                    bg-[#2a3942]
-                    hover:bg-[#374248]
-                    text-white
+                    bg-gray-200
+                    hover:bg-gray-300
+                    text-gray-800
                     py-3
                     rounded-lg
                     transition
+                    font-semibold
                   "
                 >
                   Annulla

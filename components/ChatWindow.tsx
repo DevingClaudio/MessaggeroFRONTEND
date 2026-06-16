@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useRef } from "react";
 import { privateChatAPI, groupsAPI } from "@/lib/api";
-import { Send, Paperclip, Smile, Phone, MoreVertical } from "lucide-react";
+import { Send, Paperclip, Smile, MoreVertical } from "lucide-react";
+import GroupSettings from "./GroupSettings";
 
 interface ChatWindowProps {
   chat: any;
@@ -18,6 +19,8 @@ export default function ChatWindow({
   const [messages, setMessages] = useState<any[]>([]);
   const [messageInput, setMessageInput] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [showGroupSettings, setShowGroupSettings] = useState(false);
+  const [groupDetails, setGroupDetails] = useState<any>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -38,6 +41,24 @@ export default function ChatWindow({
 
     return () => clearInterval(interval);
   }, [chat]);
+
+  useEffect(() => {
+    // Load group details if it's a group chat
+    if (chat.type === "group") {
+      loadGroupDetails();
+    }
+  }, [chat]);
+
+  const loadGroupDetails = async () => {
+    try {
+      const result = await groupsAPI.getDetails(token, chat.id);
+      if (result.success) {
+        setGroupDetails(result);
+      }
+    } catch (err) {
+      console.error("Failed to load group details:", err);
+    }
+  };
 
   const loadMessages = async () => {
     try {
@@ -94,9 +115,9 @@ export default function ChatWindow({
   };
 
   return (
-    <main className="flex-1 h-full min-h-0 flex flex-col bg-[#0b141a]">
+    <main className="flex-1 h-full min-h-0 flex flex-col bg-white">
       {/* HEADER */}
-      <div className="h-[15] px-4 bg-[#202c33] border-b border-[#2a3942] flex items-center justify-between">
+      <div className="h-16 px-4 bg-white border-b border-gray-200 flex items-center justify-between">
         <div className="flex items-center gap-3">
           {chat.type === "private" ? (
             <img
@@ -113,11 +134,11 @@ export default function ChatWindow({
               w-10
               h-10
               rounded-full
-              bg-[#00a884]
+              bg-green-600
               flex
               items-center
               justify-center
-              text-black
+              text-white
               font-bold
             "
             >
@@ -126,19 +147,25 @@ export default function ChatWindow({
           )}
 
           <div>
-            <h3 className="text-[#e9edef] text-sm font-medium">
+            <h3 className="text-gray-800 text-sm font-semibold">
               {chat.type === "private" ? chat.otherUsername : chat.name}
             </h3>
-
-            <p className="text-xs text-[#8696a0]">
-              {chat.type === "private" ? chat.otherUserStatus : "Gruppo"}
-            </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-5 text-[#aebac1]">
-          <Phone size={20} className="cursor-pointer" />
-          <MoreVertical size={20} className="cursor-pointer" />
+        <div className="flex items-center gap-5 text-gray-600">
+          {chat.type === "group" && (
+            <button
+              onClick={() => setShowGroupSettings(true)}
+              className="hover:text-green-600 transition"
+              title="Gestisci membri"
+            >
+              <MoreVertical size={20} />
+            </button>
+          )}
+          {chat.type === "private" && (
+            <MoreVertical size={20} className="cursor-pointer" />
+          )}
         </div>
       </div>
 
@@ -152,11 +179,9 @@ export default function ChatWindow({
         py-6
         flex
         flex-col
-        gap-2
+        gap-3
+        bg-gradient-to-b from-gray-50 to-gray-100
         "
-        style={{
-          backgroundImage: "url('https://i.imgur.com/6uNtNAC.jpeg')",
-        }}
       >
         {messages.map((msg) => {
           const isMine = msg.sender_id === currentUserId;
@@ -169,21 +194,21 @@ export default function ChatWindow({
               <div
                 className={`
                   max-w-[65%]
-                  px-3
+                  px-4
                   py-2
-                  rounded-lg
-                  shadow-sm
+                  rounded-2xl
+                  shadow-md
                   text-sm
                   relative
                   ${
                     isMine
-                      ? "bg-[#005c4b] text-[#e9edef]"
-                      : "bg-[#202c33] text-[#e9edef]"
+                      ? "bg-green-600 text-white rounded-bl-none"
+                      : "bg-gray-300 text-gray-800 rounded-br-none"
                   }
                 `}
               >
                 {!isMine && chat.type === "group" && (
-                  <p className="text-xs text-[#53bdeb] mb-1 font-medium">
+                  <p className="text-xs text-blue-700 mb-1 font-semibold">
                     {msg.username}
                   </p>
                 )}
@@ -196,10 +221,14 @@ export default function ChatWindow({
                   justify-end
                   items-center
                   gap-1
-                  mt-1
+                  mt-2
                 "
                 >
-                  <span className="text-[11px] text-[#8696a0]">
+                  <span
+                    className={`text-xs ${
+                      isMine ? "text-green-100" : "text-gray-600"
+                    }`}
+                  >
                     {new Date(msg.created_at).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
@@ -215,7 +244,7 @@ export default function ChatWindow({
       </div>
 
       {/* INPUT */}
-      <div className="px-4 py-3 bg-[#202c33]">
+      <div className="px-4 py-3 bg-white border-t border-gray-200">
         <form onSubmit={handleSendMessage} className="flex items-center gap-3">
           <input
             type="text"
@@ -224,14 +253,14 @@ export default function ChatWindow({
             onChange={(e) => setMessageInput(e.target.value)}
             className="
               flex-1
-              bg-[#2a3942]
+              bg-gray-100
               h-11
               rounded-lg
               px-4
               text-sm
-              text-white
+              text-gray-800
               outline-none
-              placeholder:text-[#8696a0]
+              placeholder:text-gray-400
             "
           />
 
@@ -242,8 +271,8 @@ export default function ChatWindow({
               w-11
               h-11
               rounded-full
-              bg-[#00a884]
-              hover:bg-[#06cf9c]
+              bg-green-600
+              hover:bg-green-700
               disabled:opacity-50
               flex
               items-center
@@ -251,10 +280,22 @@ export default function ChatWindow({
               transition
             "
           >
-            <Send size={18} className="text-black" />
+            <Send size={18} className="text-white" />
           </button>
         </form>
       </div>
+
+      {/* GROUP SETTINGS MODAL */}
+      {showGroupSettings && groupDetails && (
+        <GroupSettings
+          groupId={chat.id}
+          groupName={chat.name}
+          members={groupDetails.members}
+          token={token}
+          onClose={() => setShowGroupSettings(false)}
+          onMemberAdded={() => loadGroupDetails()}
+        />
+      )}
     </main>
   );
 }

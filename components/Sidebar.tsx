@@ -43,9 +43,9 @@ export default function Sidebar({
   const [tab, setTab] = useState<"chats" | "groups">("chats");
 
   return (
-    <aside className="h-full flex flex-col bg-[#111b21] text-white">
+    <aside className="h-full flex flex-col bg-white text-gray-800">
       {/* HEADER */}
-      <div className="h-[60px] px-4 bg-[#202c33] flex items-center justify-between border-b border-[#2a3942]">
+      <div className="h-16 px-4 bg-white border-b border-gray-200 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <img
             src={
@@ -57,27 +57,23 @@ export default function Sidebar({
           />
 
           <div>
-            <h3 className="text-sm font-medium text-[#e9edef]">
+            <h3 className="text-sm font-semibold text-gray-800">
               {user?.username}
             </h3>
-
-            {/*<p className="text-xs text-[#8696a0]">
-              {user?.status === "online" ? "online" : "offline"}
-            </p>*/}
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           <button
             onClick={onShowSearch}
-            className="text-[#aebac1] hover:text-white transition"
+            className="text-gray-600 hover:text-green-600 transition"
           >
             <MessageSquarePlus size={20} />
           </button>
 
           <button
             onClick={onLogout}
-            className="text-[#aebac1] hover:text-red-400 transition"
+            className="text-gray-600 hover:text-red-500 transition"
           >
             <LogOut size={20} />
           </button>
@@ -85,9 +81,9 @@ export default function Sidebar({
       </div>
 
       {/* SEARCH */}
-      <div className="p-3 bg-[#111b21] border-b border-[#222e35]">
-        <div className="bg-[#202c33] rounded-lg px-4 h-10 flex items-center gap-3">
-          <Search size={18} className="text-[#8696a0]" />
+      <div className="p-3 bg-white border-b border-gray-200">
+        <div className="bg-gray-100 rounded-lg px-4 h-10 flex items-center gap-3">
+          <Search size={18} className="text-gray-500" />
 
           <input
             type="text"
@@ -102,8 +98,8 @@ export default function Sidebar({
               flex-1
               outline-none
               text-sm
-              text-[#e9edef]
-              placeholder:text-[#8696a0]
+              text-gray-800
+              placeholder:text-gray-400
             "
           />
         </div>
@@ -111,7 +107,7 @@ export default function Sidebar({
 
       {/* SEARCH RESULTS */}
       {showSearch && searchResults.length > 0 && (
-        <div className="border-b border-[#222e35] bg-[#111b21]">
+        <div className="border-b border-gray-200 bg-white">
           {searchResults.map((user) => (
             <div
               key={user.id}
@@ -122,9 +118,11 @@ export default function Sidebar({
                 gap-3
                 px-4
                 py-3
-                hover:bg-[#202c33]
+                hover:bg-gray-50
                 cursor-pointer
                 transition
+                border-b
+                border-gray-100
               "
             >
               <img
@@ -136,12 +134,12 @@ export default function Sidebar({
                 className="w-12 h-12 rounded-full object-cover"
               />
 
-              <div className="flex-1 border-b border-[#222e35] pb-3">
-                <h4 className="text-sm text-[#e9edef] font-medium">
+              <div className="flex-1">
+                <h4 className="text-sm text-gray-800 font-medium">
                   {user.username}
                 </h4>
 
-                <p className="text-xs text-[#8696a0]">{user.status}</p>
+                <p className="text-xs text-gray-500 mt-1">{user.status}</p>
               </div>
             </div>
           ))}
@@ -149,7 +147,7 @@ export default function Sidebar({
       )}
 
       {/* TABS */}
-      <div className="flex border-b border-[#222e35] bg-[#111b21]">
+      <div className="flex border-b border-gray-200 bg-white">
         <button
           onClick={() => setTab("chats")}
           className={`
@@ -160,11 +158,12 @@ export default function Sidebar({
             justify-center
             gap-2
             text-sm
+            font-medium
             transition
             ${
               tab === "chats"
-                ? "text-[#00a884] border-b-2 border-[#00a884]"
-                : "text-[#8696a0]"
+                ? "text-green-600 border-b-2 border-green-600"
+                : "text-gray-600"
             }
           `}
         >
@@ -182,11 +181,12 @@ export default function Sidebar({
             justify-center
             gap-2
             text-sm
+            font-medium
             transition
             ${
               tab === "groups"
-                ? "text-[#00a884] border-b-2 border-[#00a884]"
-                : "text-[#8696a0]"
+                ? "text-green-600 border-b-2 border-green-600"
+                : "text-gray-600"
             }
           `}
         >
@@ -211,9 +211,9 @@ export default function Sidebar({
                 cursor-pointer
                 transition
                 border-b
-                border-[#222e35]
-                hover:bg-[#202c33]
-                ${selectedChat?.id === chat.id ? "bg-[#2a3942]" : ""}
+                border-gray-100
+                hover:bg-gray-50
+                ${selectedChat?.id === chat.id ? "bg-gray-100" : ""}
               `}
             >
               <img
@@ -227,14 +227,14 @@ export default function Sidebar({
 
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-center">
-                  <h4 className="text-[#e9edef] text-sm truncate">
+                  <h4 className="text-gray-800 text-sm truncate font-medium">
                     {chat.otherUsername}
                   </h4>
 
-                  <span className="text-[11px] text-[#8696a0]">12:45</span>
+                  <span className="text-xs text-gray-400">12:45</span>
                 </div>
 
-                <p className="text-xs text-[#8696a0] truncate mt-1">
+                <p className="text-xs text-gray-500 truncate mt-1">
                   {chat.otherUserStatus}
                 </p>
               </div>
@@ -255,9 +255,9 @@ export default function Sidebar({
                   cursor-pointer
                   transition
                   border-b
-                  border-[#222e35]
-                  hover:bg-[#202c33]
-                  ${selectedChat?.id === group.id ? "bg-[#2a3942]" : ""}
+                  border-gray-100
+                  hover:bg-gray-50
+                  ${selectedChat?.id === group.id ? "bg-gray-100" : ""}
                 `}
               >
                 <div
@@ -265,21 +265,24 @@ export default function Sidebar({
                   w-12
                   h-12
                   rounded-full
-                  bg-[#00a884]
+                  bg-green-600
                   flex
                   items-center
                   justify-center
-                  text-black
+                  text-white
                   font-bold
+                  text-lg
                 "
                 >
                   {group.name.charAt(0).toUpperCase()}
                 </div>
 
                 <div className="flex-1">
-                  <h4 className="text-sm text-[#e9edef]">{group.name}</h4>
+                  <h4 className="text-sm text-gray-800 font-medium">
+                    {group.name}
+                  </h4>
 
-                  <p className="text-xs text-[#8696a0] mt-1">
+                  <p className="text-xs text-gray-500 mt-1">
                     {group.memberCount} membri
                   </p>
                 </div>
@@ -291,10 +294,10 @@ export default function Sidebar({
                 onClick={onShowCreateGroup}
                 className="
                   w-full
-                  bg-[#00a884]
-                  hover:bg-[#06cf9c]
-                  text-black
-                  font-medium
+                  bg-green-600
+                  hover:bg-green-700
+                  text-white
+                  font-semibold
                   py-3
                   rounded-lg
                   transition
